@@ -1,41 +1,45 @@
 // lib/pokeapi/http.ts
-import type { PokemonDetail, PokemonListItem } from "./types";
+import type { PokemonDetail, PokemonListItem } from "@/lib/pokeapi/types";
 
-export async function getPokemonListFromApiRoute(): Promise<PokemonListItem[]> {
-  // Server Component runs on server — we can call absolute URL.
-  // Use VERCEL_URL when deployed, fallback to localhost in dev.
-  const base =
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
+function getBaseUrl() {
+  // If you set this in Vercel env, it wins (recommended)
+  const explicit =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.SITE_URL;
 
-  const res = await fetch(`${base}/api/pokemon`, {
-    // Helps performance; safe because list rarely changes
-    next: { revalidate: 3600 },
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  // Vercel provides this at runtime
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  // Local dev fallback
+  return "http://localhost:3000";
+}
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const res = await fetch(url, {
+    // cache behaviour is optional – keep it safe in prod
+    next: { revalidate: 60 * 60 }, // 1h
   });
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch /api/pokemon (${res.status})`);
+    const text = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status} for ${url}. ${text}`.slice(0, 500));
   }
 
-  return (await res.json()) as PokemonListItem[];
+  return res.json() as Promise<T>;
 }
 
 export async function getPokemonDetailFromApiRoute(idOrName: string): Promise<PokemonDetail> {
-  const baseUrl =
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000";
+  const base = getBaseUrl();
+  const safe = encodeURIComponent(String(idOrName).trim().toLowerCase());
+  return fetchJson<PokemonDetail>(`${base}/api/pokemon/${safe}`);
+}
 
-  const safe = encodeURIComponent(idOrName);
-
-  const res = await fetch(`${baseUrl}/api/pokemon/${safe}`, {
-    next: { revalidate: 3600 },
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch pokemon detail (${res.status})`);
-  }
-
-  return (await res.json()) as PokemonDetail;
+export async function getPokemonListFromApiRoute(): Promise<PokemonListItem[]> {
+  const base = getBaseUrl();
+  return fetchJson<PokemonListItem[]>(`${base}/api/pokemon`);
 }
