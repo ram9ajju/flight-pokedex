@@ -47,13 +47,14 @@
 
 .brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .title {
   margin: 0;
-  font-size: 48px;
+  font-size: 36px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -63,8 +64,24 @@
   margin: 0;
   opacity: 0.75;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 16px;
   text-align: center;
+}
+
+/* Desktop: side by side */
+@media (min-width: 640px) {
+  .brand {
+    flex-direction: row;
+    gap: 16px;
+  }
+  
+  .title {
+    font-size: 48px;
+  }
+  
+  .sub {
+    font-size: 20px;
+  }
 }
 
 .content {
