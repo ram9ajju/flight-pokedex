@@ -10,7 +10,7 @@ import { SortSelect } from "@/components/SortSelect";
 import { Pagination } from "@/components/Pagination";
 
 import {
-  matchesPokemon,
+  filterPokemon,
   paginate,
   sortPokemon,
   type SortDir,
@@ -19,6 +19,8 @@ import {
 
 import { debounce } from "@/lib/pokeapi/debounce";
 import styles from "./PokedexClient.module.css";
+
+
 
 const PER_PAGE = 24;
 
@@ -61,9 +63,10 @@ export function PokedexClient({ initialPokemon }: { initialPokemon: PokemonListI
 
   // --- compute list ---
   const filteredSorted = useMemo(() => {
-    const filtered = initialPokemon.filter((p) => matchesPokemon(p, query));
+    const filtered = filterPokemon(initialPokemon, query);
     return sortPokemon(filtered, sortKey, sortDir);
   }, [initialPokemon, query, sortKey, sortDir]);
+
 
   const paged = useMemo(() => paginate(filteredSorted, page, PER_PAGE), [filteredSorted, page]);
 

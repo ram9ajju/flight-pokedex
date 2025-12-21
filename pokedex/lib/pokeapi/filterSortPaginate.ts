@@ -3,6 +3,47 @@ import type { PokemonListItem } from "@/lib/pokeapi/types";
 import { parseSmartQuery } from "@/lib/pokeapi/smartSearch";
 import { computeDefensiveMultipliers, isTypeName, type TypeName } from "@/lib/pokeapi/typeChart";
 
+// Add near top of file
+const TYPE_LIST = [
+  "normal","fire","water","electric","grass","ice","fighting","poison","ground","flying",
+  "psychic","bug","rock","ghost","dragon","dark","steel","fairy",
+] as const;
+
+function typeFromPrefix(prefix: string): TypeName | null {
+  const p = prefix.toLowerCase();
+  if (p.length < 2) return null;
+
+  const match = TYPE_LIST.find(t => t.startsWith(p));
+  return (match && isTypeName(match)) ? (match as TypeName) : null;
+}
+
+export function filterPokemon(list: PokemonListItem[], q: string) {
+  const nq = normalizeQuery(q);
+  if (!nq) return list;
+
+  // 1) normal filtering using your existing smart matching
+  const primary = list.filter(p => matchesPokemon(p, nq));
+
+  // 2) if results exist, keep them
+  if (primary.length > 0) return primary;
+
+  // 3) fallback to type-prefix ONLY when input looks like a type prefix
+  // - alphabetic
+  // - length >= 2
+  // - not already a smart intent that should stay strict (weak/resists/type/all)
+  if (!/^[a-z]+$/.test(nq) || nq.length < 2) return primary;
+
+  const intent = parseSmartQuery(nq);
+  // If user explicitly wrote a structured query, don't override it
+  if (intent.kind !== "idOrName") return primary;
+
+  const type = typeFromPrefix(nq);
+  if (!type) return primary;
+
+  // Return Pokémon whose types include this type
+  return list.filter(p => p.types.map(t => t.toLowerCase()).includes(type));
+}
+
 export type SortKey = "number" | "name";
 export type SortDir = "asc" | "desc";
 
