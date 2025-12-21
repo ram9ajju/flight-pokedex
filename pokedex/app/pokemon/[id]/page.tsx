@@ -182,33 +182,6 @@ export default async function PokemonDetailPage({
               <div className={styles.sectionTitle}>Controls</div>
               <div className={styles.controls}>
                 <div className={styles.dpad} aria-hidden />
-                <div style={{ display: "grid", gap: 10, width: "100%" }}>
-                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                    {prevId ? (
-                      <Link className={styles.pillButton} href={`/pokemon/${prevId}`}>
-                        ← Prev
-                      </Link>
-                    ) : (
-                      <span className={styles.pillButton} style={{ opacity: 0.4, pointerEvents: "none" }}>
-                        ← Prev
-                      </span>
-                    )}
-
-                    {nextId ? (
-                      <Link className={styles.pillButton} href={`/pokemon/${nextId}`}>
-                        Next →
-                      </Link>
-                    ) : (
-                      <span className={styles.pillButton} style={{ opacity: 0.4, pointerEvents: "none" }}>
-                        Next →
-                      </span>
-                    )}
-                  </div>
-
-                  <div className={styles.smallNote}>
-                    (Smart search will live on the home screen — this stays as “device controls”.)
-                  </div>
-                </div>
               </div>
             </div>
           </div>

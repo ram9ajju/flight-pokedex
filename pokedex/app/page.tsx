@@ -1,11 +1,11 @@
 // app/page.tsx
 import styles from "./home.module.css";
-import { getPokemonListFromApiRoute } from "@/lib/pokeapi/http";
+import { getGen1PokemonList } from "@/lib/pokeapi/service";
 import { PokedexClient } from "@/components/PokedexClient";
 import Image from "next/image";
 
 export default async function HomePage() {
-  const pokemon = await getPokemonListFromApiRoute();
+  const pokemon = await getGen1PokemonList();
 
   return (
     <div className={styles.page}>
