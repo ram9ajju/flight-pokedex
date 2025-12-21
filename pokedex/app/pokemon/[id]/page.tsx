@@ -1,7 +1,8 @@
 // app/pokemon/[id]/page.tsx
 import Link from "next/link";
 import styles from "./pokemon-detail.module.css";
-import { getPokemonDetailFromApiRoute } from "@/lib/pokeapi/http";
+import { getPokemonDetail } from "@/lib/pokeapi/service";
+import { computeWeaknesses, getEvolutionsFromChainUrl, getFlavorTextForPokemon } from "@/lib/pokeapi/enrich";
 import type { PokemonDetail, PokemonStat, PokemonEvolutionStage } from "@/lib/pokeapi/types";
 import { TypeBadge } from "@/components/TypeBadge";
 
@@ -98,7 +99,19 @@ export default async function PokemonDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const pokemon: PokemonDetail = await getPokemonDetailFromApiRoute(id);
+  const detail = await getPokemonDetail(id);
+
+  // enrich the same way your API route does
+  const { flavorText, evolutionChainUrl } = await getFlavorTextForPokemon(detail.id);
+  const weaknesses = await computeWeaknesses(detail.types);
+  const evolutions = await getEvolutionsFromChainUrl(evolutionChainUrl);
+
+  const pokemon: PokemonDetail = {
+    ...detail,
+    flavorText,
+    weaknesses,
+    evolutions,
+  };
 
   const prevId = pokemon.id > 1 ? pokemon.id - 1 : null;
   const nextId = pokemon.id < 151 ? pokemon.id + 1 : null;
