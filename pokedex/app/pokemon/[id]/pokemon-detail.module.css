@@ -1,0 +1,275 @@
+/* app/pokemon/[id]/pokemon-detail.module.css */
+
+.page {
+  min-height: 100vh;
+  background: #2b2b2b; /* dark shell */
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.device {
+  width: min(980px, 100%);
+  background: #d9d2c4; /* GBA-ish beige/grey */
+  border-radius: 18px;
+  border: 3px solid #1f1f1f;
+  box-shadow: 0 10px 0 rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+.topBar {
+  background: #b9b1a3;
+  border-bottom: 3px solid #1f1f1f;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: #1f1f1f;
+}
+
+.backLink {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 2px solid #1f1f1f;
+  background: #f2ecdf;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  color: #1f1f1f;
+}
+
+.backLink:hover {
+  transform: translateY(-1px);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+
+@media (max-width: 860px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: #f2ecdf;
+  border: 3px solid #1f1f1f;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.45);
+}
+
+.leftPanel {
+  display: grid;
+  gap: 12px;
+}
+
+.spriteFrame {
+  background: #e7dfcf;
+  border: 3px solid #1f1f1f;
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.45);
+}
+
+.sprite {
+  width: 240px;
+  height: 240px;
+  object-fit: contain;
+}
+
+@media (max-width: 860px) {
+  .sprite {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+.identity {
+  display: grid;
+  gap: 8px;
+}
+
+.nameRow {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.dexNo {
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.name {
+  font-size: 22px;
+  font-weight: 900;
+  text-transform: capitalize;
+}
+
+.types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.typeBadge {
+  border: 2px solid #1f1f1f;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-weight: 900;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: #fff;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.metaItem {
+  border: 2px solid #1f1f1f;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+}
+
+.metaLabel {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.metaValue {
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.rightPanel {
+  display: grid;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 8px;
+}
+
+.stats {
+  display: grid;
+  gap: 10px;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: 110px 1fr 44px;
+  gap: 10px;
+  align-items: center;
+}
+
+.statName {
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.statBarWrap {
+  height: 14px;
+  border: 2px solid #1f1f1f;
+  border-radius: 999px;
+  background: #e7dfcf;
+  overflow: hidden;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+}
+
+.statBar {
+  height: 100%;
+  background: #1f1f1f;
+}
+
+.statValue {
+  font-weight: 900;
+  text-align: right;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.dpad {
+  width: 64px;
+  height: 64px;
+  background: #1f1f1f;
+  border-radius: 14px;
+  position: relative;
+  box-shadow: inset 0 4px 0 rgba(255,255,255,0.15);
+}
+
+.dpad::before,
+.dpad::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #3a3a3a;
+  border-radius: 10px;
+}
+
+.dpad::before {
+  width: 46px;
+  height: 16px;
+}
+.dpad::after {
+  width: 16px;
+  height: 46px;
+}
+
+.pillButton {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 2px solid #1f1f1f;
+  background: #fff;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.smallNote {
+  opacity: 0.75;
+  font-size: 12px;
+}

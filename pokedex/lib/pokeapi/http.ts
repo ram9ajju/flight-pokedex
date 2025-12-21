@@ -1,5 +1,5 @@
 // lib/pokeapi/http.ts
-import type { PokemonListItem } from "./types";
+import type { PokemonDetail, PokemonListItem } from "./types";
 
 export async function getPokemonListFromApiRoute(): Promise<PokemonListItem[]> {
   // Server Component runs on server — we can call absolute URL.
@@ -19,4 +19,23 @@ export async function getPokemonListFromApiRoute(): Promise<PokemonListItem[]> {
   }
 
   return (await res.json()) as PokemonListItem[];
+}
+
+export async function getPokemonDetailFromApiRoute(idOrName: string): Promise<PokemonDetail> {
+  const baseUrl =
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
+
+  const safe = encodeURIComponent(idOrName);
+
+  const res = await fetch(`${baseUrl}/api/pokemon/${safe}`, {
+    next: { revalidate: 3600 },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch pokemon detail (${res.status})`);
+  }
+
+  return (await res.json()) as PokemonDetail;
 }
