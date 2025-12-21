@@ -4,7 +4,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { PokemonListItem } from "@/lib/pokeapi/types";
-
 import { PokemonCard } from "@/components/PokemonCard";
 import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";

@@ -29,6 +29,9 @@ const ALL_TYPES = [
   "psychic","bug","rock","ghost","dragon","dark","steel","fairy",
 ];
 
+// ✅ Gen 1 boundary
+const GEN1_MAX_ID = 151;
+
 function cleanFlavorText(s: string) {
   return s.replace(/\f|\n|\r/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -38,7 +41,13 @@ function idFromSpeciesUrl(url: string) {
   return m ? Number(m[1]) : NaN;
 }
 
-export async function getFlavorTextForPokemon(id: number): Promise<{ flavorText: string; evolutionChainUrl: string }> {
+function isGen1Id(id: number) {
+  return Number.isFinite(id) && id >= 1 && id <= GEN1_MAX_ID;
+}
+
+export async function getFlavorTextForPokemon(
+  id: number
+): Promise<{ flavorText: string; evolutionChainUrl: string }> {
   const species = await fetchJson<PokeApiSpecies>(`/pokemon-species/${id}`);
   const entry = species.flavor_text_entries.find((e) => e.language?.name === "en");
   return {
@@ -55,7 +64,9 @@ export async function getTypeDamageRelations(typeName: string) {
   const existing = typeCache.get(key);
   if (existing) return existing;
 
-  const p = fetchJson<PokeApiType>(`/type/${encodeURIComponent(key)}`).then((t) => t.damage_relations);
+  const p = fetchJson<PokeApiType>(`/type/${encodeURIComponent(key)}`).then(
+    (t) => t.damage_relations
+  );
   typeCache.set(key, p);
   return p;
 }
@@ -90,34 +101,41 @@ export async function computeWeaknesses(types: string[]): Promise<PokemonWeaknes
   return { weakTo, resistantTo, immuneTo };
 }
 
-export async function getEvolutionsFromChainUrl(chainUrl: string): Promise<PokemonEvolutionStage[]> {
+export async function getEvolutionsFromChainUrl(
+  chainUrl: string
+): Promise<PokemonEvolutionStage[]> {
   if (!chainUrl) return [];
 
   const rel = chainUrl.replace("https://pokeapi.co/api/v2", "");
   const data = await fetchJson<PokeApiEvolutionChain>(rel);
 
+  // We'll build stages as before, then filter to Gen 1 and re-index.
   const stages: PokemonEvolutionStage[] = [];
 
   function mergeStage(stage: number, options: { id: number; name: string }[]) {
     if (!options.length) return;
+
     const existing = stages.find((s) => s.stage === stage);
     if (!existing) {
       stages.push({ stage, options });
       return;
     }
+
     const byId = new Map(existing.options.map((o) => [o.id, o]));
     for (const o of options) byId.set(o.id, o);
     existing.options = Array.from(byId.values());
   }
 
-  // stage 0
-  mergeStage(0, [
-    { id: idFromSpeciesUrl(data.chain.species.url), name: data.chain.species.name },
-  ].filter((x) => Number.isFinite(x.id)));
+  // stage 0 (base)
+  const baseId = idFromSpeciesUrl(data.chain.species.url);
+  mergeStage(
+    0,
+    [{ id: baseId, name: data.chain.species.name }].filter((x) => Number.isFinite(x.id))
+  );
 
-  // stage 1+
+  // stage 1+ (walk breadth by "depth")
   function walk(nodes: EvoNode[], stage: number) {
-    if (!nodes.length) return;
+    if (!nodes?.length) return;
 
     mergeStage(
       stage,
@@ -132,5 +150,21 @@ export async function getEvolutionsFromChainUrl(chainUrl: string): Promise<Pokem
 
   walk(data.chain.evolves_to ?? [], 1);
 
-  return stages.sort((a, b) => a.stage - b.stage);
+  // ✅ Filter to Gen 1 only
+  const gen1Stages = stages
+    .map((s) => ({
+      stage: s.stage,
+      options: s.options.filter((o) => isGen1Id(o.id)),
+    }))
+    .filter((s) => s.options.length > 0)
+    .sort((a, b) => a.stage - b.stage);
+
+  // ✅ Re-index stages to be 0..N without gaps
+  // (important when later-gen options got removed)
+  const reindexed: PokemonEvolutionStage[] = gen1Stages.map((s, i) => ({
+    stage: i,
+    options: s.options,
+  }));
+
+  return reindexed;
 }

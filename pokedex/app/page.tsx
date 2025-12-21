@@ -2,6 +2,7 @@
 import styles from "./home.module.css";
 import { getPokemonListFromApiRoute } from "@/lib/pokeapi/http";
 import { PokedexClient } from "@/components/PokedexClient";
+import Image from "next/image";
 
 export default async function HomePage() {
   const pokemon = await getPokemonListFromApiRoute();
@@ -11,9 +12,10 @@ export default async function HomePage() {
       <div className={styles.shell}>
         <div className={styles.topBar}>
           <div className={styles.brand}>
+            <Image src="/pokemon-logo.svg" alt="Pokémon" width={80} height={80} priority />
             <h1 className={styles.title}>Pokédex</h1>
-            <p className={styles.sub}>Original 151 • Search / Sort / Paginate</p>
           </div>
+          <p className={styles.sub}>Kanto Region - Smart Search</p>
         </div>
 
         <div className={styles.content}>
