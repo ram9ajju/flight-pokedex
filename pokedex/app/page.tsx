@@ -1,4 +1,5 @@
 // app/page.tsx
+import styles from "./home.module.css";
 import { getPokemonListFromApiRoute } from "@/lib/pokeapi/http";
 import { PokedexClient } from "@/components/PokedexClient";
 
@@ -6,13 +7,19 @@ export default async function HomePage() {
   const pokemon = await getPokemonListFromApiRoute();
 
   return (
-    <main style={{ maxWidth: 1100, margin: "0 auto", padding: 24 }}>
-      <header style={{ marginBottom: 16 }}>
-        <h1 style={{ margin: 0 }}>Pokédex</h1>
-        <p style={{ marginTop: 6, opacity: 0.7 }}>Original 151 Pokémon</p>
-      </header>
+    <div className={styles.page}>
+      <div className={styles.shell}>
+        <div className={styles.topBar}>
+          <div className={styles.brand}>
+            <h1 className={styles.title}>Pokédex</h1>
+            <p className={styles.sub}>Original 151 • Search / Sort / Paginate</p>
+          </div>
+        </div>
 
-      <PokedexClient initialPokemon={pokemon} />
-    </main>
+        <div className={styles.content}>
+          <PokedexClient initialPokemon={pokemon} />
+        </div>
+      </div>
+    </div>
   );
 }

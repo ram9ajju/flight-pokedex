@@ -3,6 +3,7 @@ import Link from "next/link";
 import styles from "./pokemon-detail.module.css";
 import { getPokemonDetailFromApiRoute } from "@/lib/pokeapi/http";
 import type { PokemonDetail, PokemonStat } from "@/lib/pokeapi/types";
+import { TypeBadge } from "@/components/TypeBadge";
 
 function pad3(n: number) {
   return String(n).padStart(3, "0");
@@ -81,9 +82,7 @@ export default async function PokemonDetailPage({
 
                 <div className={styles.types}>
                   {pokemon.types.map((t) => (
-                    <span key={t} className={styles.typeBadge}>
-                      {t}
-                    </span>
+                    <TypeBadge key={t} type={t} />
                   ))}
                 </div>
               </div>

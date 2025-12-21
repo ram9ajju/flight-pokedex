@@ -1,0 +1,88 @@
+/* app/home.module.css */
+
+.page {
+  min-height: 100vh;
+  padding: 28px 18px;
+  background: #2b2b2b; /* outer */
+  display: flex;
+  justify-content: center;
+}
+
+.shell {
+  width: min(1160px, 100%);
+  background: linear-gradient(180deg, #e9e2d4 0%, #f2ecdf 100%);
+  border: 3px solid #1f1f1f;
+  border-radius: 18px;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  position: relative;
+}
+
+/* subtle pokeball pattern (monochrome) */
+.shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20px 20px, rgba(0,0,0,0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 20px 20px, transparent 0 16px, rgba(0,0,0,0.35) 17px 18px, transparent 19px),
+    radial-gradient(circle at 20px 20px, transparent 0 36px, rgba(0,0,0,0.25) 37px 38px, transparent 39px);
+  background-size: 140px 140px;
+  background-position: 0 0;
+}
+
+.topBar {
+  position: relative;
+  z-index: 1;
+  background: #b9b1a3;
+  border-bottom: 3px solid #1f1f1f;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: grid;
+  gap: 4px;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sub {
+  margin: 0;
+  opacity: 0.75;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+/* 3-up grid on desktop */
+.grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 860px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
