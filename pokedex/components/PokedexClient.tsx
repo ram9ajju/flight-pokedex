@@ -2,8 +2,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { PokemonListItem } from "@/lib/pokeapi/types";
-import styles from "./PokedexClient.module.css";
+
 import { PokemonCard } from "@/components/PokemonCard";
 import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
@@ -18,22 +19,34 @@ import {
 } from "@/lib/pokeapi/filterSortPaginate";
 
 import { debounce } from "@/lib/pokeapi/debounce";
+import styles from "./PokedexClient.module.css";
 
 const PER_PAGE = 24;
 
-export function PokedexClient({
-  initialPokemon,
-}: {
-  initialPokemon: PokemonListItem[];
-}) {
-  // UI state
-  const [queryInput, setQueryInput] = useState("");
-  const [query, setQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("number");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
-  const [page, setPage] = useState(1);
+function parseSortKey(v: string | null): SortKey {
+  return v === "name" ? "name" : "number";
+}
+function parseSortDir(v: string | null): SortDir {
+  return v === "desc" ? "desc" : "asc";
+}
+function parsePage(v: string | null): number {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
+}
 
-  // Debounced application of search query
+export function PokedexClient({ initialPokemon }: { initialPokemon: PokemonListItem[] }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const sp = useSearchParams();
+
+  // --- initial state from URL (runs once on mount) ---
+  const [queryInput, setQueryInput] = useState(() => sp.get("q") ?? "");
+  const [query, setQuery] = useState(() => sp.get("q") ?? "");
+  const [sortKey, setSortKey] = useState<SortKey>(() => parseSortKey(sp.get("sort")));
+  const [sortDir, setSortDir] = useState<SortDir>(() => parseSortDir(sp.get("dir")));
+  const [page, setPage] = useState(() => parsePage(sp.get("page")));
+
+  // --- debounced apply query to filter set ---
   const applyQueryDebounced = useMemo(
     () =>
       debounce((v: string) => {
@@ -47,24 +60,45 @@ export function PokedexClient({
     applyQueryDebounced(queryInput);
   }, [queryInput, applyQueryDebounced]);
 
-  // Filter + sort
+  // --- compute list ---
   const filteredSorted = useMemo(() => {
-    const filtered = initialPokemon.filter((p) =>
-      matchesPokemon(p, query)
-    );
+    const filtered = initialPokemon.filter((p) => matchesPokemon(p, query));
     return sortPokemon(filtered, sortKey, sortDir);
   }, [initialPokemon, query, sortKey, sortDir]);
 
-  // Pagination
-  const paged = useMemo(
-    () => paginate(filteredSorted, page, PER_PAGE),
-    [filteredSorted, page]
-  );
+  const paged = useMemo(() => paginate(filteredSorted, page, PER_PAGE), [filteredSorted, page]);
 
-  function onSortChange(next: {
-    sortKey: SortKey;
-    sortDir: SortDir;
-  }) {
+  // --- keep URL updated when state changes ---
+  useEffect(() => {
+    const next = new URLSearchParams();
+
+    if (queryInput.trim()) next.set("q", queryInput.trim());
+    next.set("sort", sortKey);
+    next.set("dir", sortDir);
+    if (paged.page > 1) next.set("page", String(paged.page));
+
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryInput, sortKey, sortDir, paged.page, pathname]);
+
+  // --- respond to back/forward navigation (URL changes) ---
+  useEffect(() => {
+    const urlQ = sp.get("q") ?? "";
+    const urlSort = parseSortKey(sp.get("sort"));
+    const urlDir = parseSortDir(sp.get("dir"));
+    const urlPage = parsePage(sp.get("page"));
+
+    // Only set if different to avoid loops
+    setQueryInput((cur) => (cur !== urlQ ? urlQ : cur));
+    setQuery((cur) => (cur !== urlQ ? urlQ : cur));
+    setSortKey((cur) => (cur !== urlSort ? urlSort : cur));
+    setSortDir((cur) => (cur !== urlDir ? urlDir : cur));
+    setPage((cur) => (cur !== urlPage ? urlPage : cur));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sp]);
+
+  function onSortChange(next: { sortKey: SortKey; sortDir: SortDir }) {
     setSortKey(next.sortKey);
     setSortDir(next.sortDir);
     setPage(1);
@@ -72,26 +106,11 @@ export function PokedexClient({
 
   return (
     <div style={{ display: "grid", gap: 14 }}>
-      {/* Controls */}
-      <div
-        style={{
-          display: "grid",
-          gap: 12,
-        }}
-      >
-        <SearchBar
-          value={queryInput}
-          onChange={setQueryInput}
-        />
-
-        <SortSelect
-          sortKey={sortKey}
-          sortDir={sortDir}
-          onChange={onSortChange}
-        />
+      <div style={{ display: "grid", gap: 12 }}>
+        <SearchBar value={queryInput} onChange={setQueryInput} />
+        <SortSelect sortKey={sortKey} sortDir={sortDir} onChange={onSortChange} />
       </div>
 
-      {/* Meta info */}
       <div
         style={{
           display: "flex",
@@ -106,19 +125,17 @@ export function PokedexClient({
         <div>{PER_PAGE} per page</div>
       </div>
 
-      {/* Results */}
       {paged.total === 0 ? (
         <div
           style={{
             padding: 16,
             borderRadius: 14,
-            border: "2px solid rgba(0,0,0,0.15)",
+            border: "2px solid rgba(0,0,0,0.12)",
             background: "#fff",
             fontWeight: 800,
           }}
         >
-          No Pokémon found for “{queryInput || query}”.  
-          Try another name or number.
+          No Pokémon found for “{queryInput || query}”. Try another name or number.
         </div>
       ) : (
         <section className={styles.grid}>
@@ -128,12 +145,7 @@ export function PokedexClient({
         </section>
       )}
 
-      {/* Pagination */}
-      <Pagination
-        page={paged.page}
-        totalPages={paged.totalPages}
-        onPage={setPage}
-      />
+      <Pagination page={paged.page} totalPages={paged.totalPages} onPage={setPage} />
     </div>
   );
 }

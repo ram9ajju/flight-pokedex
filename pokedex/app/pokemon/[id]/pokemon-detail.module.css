@@ -9,6 +9,10 @@
   align-items: flex-start;
 }
 
+.page * {
+  box-sizing: border-box;
+}
+
 .device {
   width: min(980px, 100%);
   background: #d9d2c4; /* GBA-ish beige/grey */
@@ -16,6 +20,7 @@
   border: 3px solid #1f1f1f;
   box-shadow: 0 10px 0 rgba(0,0,0,0.25);
   overflow: hidden;
+  min-width: 0;
 }
 
 .topBar {
@@ -55,11 +60,13 @@
 
 .body {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 340px minmax(0, 1fr);
   gap: 16px;
   padding: 16px;
+  min-width: 0;
 }
 
+/* Keep your earlier breakpoint feel */
 @media (max-width: 860px) {
   .body {
     grid-template-columns: 1fr;
@@ -72,11 +79,13 @@
   border-radius: 14px;
   padding: 14px;
   box-shadow: inset 0 3px 0 rgba(255,255,255,0.45);
+  min-width: 0;
 }
 
 .leftPanel {
   display: grid;
   gap: 12px;
+  min-width: 0;
 }
 
 .spriteFrame {
@@ -86,7 +95,9 @@
   padding: 12px;
   display: grid;
   place-items: center;
+  gap: 10px;
   box-shadow: inset 0 3px 0 rgba(255,255,255,0.45);
+  min-width: 0;
 }
 
 .sprite {
@@ -102,9 +113,46 @@
   }
 }
 
+/* Prev/Next under picture */
+.spriteNav {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
+}
+
+.navBtn,
+.navBtnDisabled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 2px solid #1f1f1f;
+  background: #fff;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 11px;
+  text-decoration: none;
+  color: #1f1f1f;
+  line-height: 1;
+  min-width: 92px;
+}
+
+.navBtn:hover {
+  transform: translateY(-1px);
+}
+
+.navBtnDisabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 .identity {
   display: grid;
   gap: 8px;
+  min-width: 0;
 }
 
 .nameRow {
@@ -112,6 +160,7 @@
   gap: 10px;
   align-items: baseline;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .dexNo {
@@ -132,21 +181,17 @@
   gap: 6px;
 }
 
-.typeBadge {
-  border: 2px solid #1f1f1f;
-  border-radius: 999px;
-  padding: 5px 10px;
-  font-weight: 900;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: #fff;
-}
-
 .metaGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  min-width: 0;
+}
+
+@media (max-width: 520px) {
+  .metaGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .metaItem {
@@ -154,6 +199,7 @@
   border-radius: 12px;
   padding: 10px;
   background: #fff;
+  min-width: 0;
 }
 
 .metaLabel {
@@ -168,11 +214,13 @@
 .metaValue {
   font-weight: 800;
   text-transform: capitalize;
+  overflow-wrap: anywhere;
 }
 
 .rightPanel {
   display: grid;
   gap: 12px;
+  min-width: 0;
 }
 
 .sectionTitle {
@@ -184,16 +232,32 @@
   margin-bottom: 8px;
 }
 
+.storyText {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
+  opacity: 0.85;
+  overflow-wrap: anywhere;
+}
+
 .stats {
   display: grid;
   gap: 10px;
+  min-width: 0;
 }
 
 .statRow {
   display: grid;
-  grid-template-columns: 110px 1fr 44px;
+  grid-template-columns: 110px minmax(0, 1fr) 44px;
   gap: 10px;
   align-items: center;
+  min-width: 0;
+}
+
+@media (max-width: 520px) {
+  .statRow {
+    grid-template-columns: 92px minmax(0, 1fr) 44px;
+  }
 }
 
 .statName {
@@ -209,6 +273,7 @@
   background: #e7dfcf;
   overflow: hidden;
   box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+  min-width: 0;
 }
 
 .statBar {
@@ -267,9 +332,244 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   font-size: 12px;
+  text-decoration: none;
+  color: #1f1f1f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .smallNote {
   opacity: 0.75;
   font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* ============================
+   TYPE MATCHUPS (2-COLUMN SIMPLE)
+   ============================ */
+
+.matchups2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .matchups2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.matchupsCol {
+  background: rgba(255, 255, 255, 0.55);
+  border: 2px solid rgba(31, 31, 31, 0.15);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.matchupsColTitle {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  opacity: 0.70;
+  margin-bottom: 10px;
+}
+
+.matchupsStack {
+  display: grid;
+  gap: 8px;
+}
+
+.matchupItem {
+  width: fit-content; /* prevents badge stretching */
+}
+/* ============================
+   TYPE MATCHUPS (2-COLUMN SIMPLE)
+   ============================ */
+
+.matchups2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .matchups2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.matchupsCol {
+  background: rgba(255, 255, 255, 0.55);
+  border: 2px solid rgba(31, 31, 31, 0.15);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.matchupsColTitle {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  opacity: 0.70;
+  margin-bottom: 10px;
+}
+
+.matchupsStack {
+  display: flex;              /* 👈 horizontal flow */
+  flex-wrap: wrap;            /* 👈 wrap nicely if many types */
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.matchupItem {
+  width: fit-content;         /* keep pills compact */
+}
+
+/* ============================
+   EVOLUTIONS (3 FIT, SQUARISH)
+   ============================ */
+
+.evoGrid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+@media (max-width: 520px) {
+  .evoGrid3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Each item can place arrow between cards without breaking grid */
+.evoGridItem {
+  position: relative;
+  min-width: 0;
+}
+
+.evoMiniArrow {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 40px;
+  font-weight: 900;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+@media (max-width: 520px) {
+  .evoMiniArrow {
+    display: none;
+  }
+}
+
+.evoMiniCard {
+  width: 100%;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 10px;
+  align-items: start;
+  justify-items: center;
+
+  padding: 10px;
+  border-radius: 14px;
+  border: 2px solid #1f1f1f;
+  background: #fff;
+  text-decoration: none;
+  color: #1f1f1f;
+  min-width: 0;
+
+  /* squarer feel so 3 fit comfortably */
+  aspect-ratio: 1 / 1;
+}
+
+.evoMiniCard:hover {
+  transform: translateY(-1px);
+}
+
+.evoMiniActive {
+  background: #f8f4ea;
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.55);
+}
+
+.evoMiniPortrait {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  border: 3px solid #1f1f1f;
+  background: #e7dfcf;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.evoMiniImg {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+}
+
+.evoMiniMeta {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  text-align: center;
+  min-width: 0;
+}
+
+.evoMiniName {
+  font-weight: 900;
+  font-size: 15px;
+  line-height: 1.1;
+  text-transform: capitalize;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evoMiniDex {
+  font-weight: 900;
+  font-size: 11px; /* smaller number */
+  letter-spacing: 0.08em;
+  opacity: 0.60;
+}
+
+/* Branching fallback layout (kept compact) */
+.evoBranchGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.evoStageBlock {
+  border: 2px solid rgba(31,31,31,0.18);
+  border-radius: 14px;
+  padding: 10px;
+  background: rgba(255,255,255,0.35);
+}
+
+.evoStageTitle {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-bottom: 8px;
+}
+
+.evoBranchRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .evoBranchRow {
+    grid-template-columns: 1fr;
+  }
 }

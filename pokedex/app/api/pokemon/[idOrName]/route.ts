@@ -1,31 +1,36 @@
+// app/api/pokemon/[idOrName]/route.ts
 import { NextResponse } from "next/server";
 import { getPokemonDetail } from "@/lib/pokeapi/service";
-
-type Params = { idOrName: string };
+import { computeWeaknesses, getEvolutionsFromChainUrl, getFlavorTextForPokemon } from "@/lib/pokeapi/enrich";
 
 export async function GET(
-  _request: Request,
-  ctx: { params: Promise<Params> } // 👈 key change: params is a Promise
+  req: Request,
+  context: { params: Promise<{ idOrName: string }> }
 ) {
+  const { idOrName } = await context.params;
+
   try {
-    const { idOrName } = await ctx.params; // 👈 await params
-    const safe = (idOrName || "").trim().toLowerCase();
+    const detail = await getPokemonDetail(idOrName);
 
-    if (!safe) {
-      return NextResponse.json({ error: "Missing idOrName" }, { status: 400 });
-    }
+    // Flavor + evolution chain url (requires numeric id)
+    const { flavorText, evolutionChainUrl } = await getFlavorTextForPokemon(detail.id);
 
-    const data = await getPokemonDetail(safe);
+    // Weakness multipliers from types
+    const weaknesses = await computeWeaknesses(detail.types);
 
-    return NextResponse.json(data, {
-      headers: {
-        "Cache-Control": "s-maxage=3600, stale-while-revalidate=86400",
-      },
+    // Evolution stages
+    const evolutions = await getEvolutionsFromChainUrl(evolutionChainUrl);
+
+    return NextResponse.json({
+      ...detail,
+      flavorText,
+      weaknesses,
+      evolutions,
     });
-  } catch (err: any) {
-    const msg = err?.message || "Unknown error";
-    const status = msg.includes("404") ? 404 : 500;
-    console.error(err);
-    return NextResponse.json({ error: msg }, { status });
+  } catch (e: any) {
+    return NextResponse.json(
+      { error: e?.message ?? "Unknown error" },
+      { status: 404 }
+    );
   }
 }

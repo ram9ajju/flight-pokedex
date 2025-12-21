@@ -16,6 +16,10 @@ export type PokemonDetail = {
   abilities: string[];
   height: number;
   weight: number;
+  //new additions
+  flavorText?: string;
+  weaknesses?: PokemonWeaknessGroup;
+  evolutions?: PokemonEvolutionStage[];
 };
 
 export type PokeApiListResponse = {
@@ -37,4 +41,15 @@ export type PokeApiPokemon = {
   abilities: Array<{ ability: { name: string } }>;
   height: number;
   weight: number;
+};
+
+export type PokemonWeaknessGroup = {
+  weakTo: { type: string; multiplier: number }[];
+  resistantTo: { type: string; multiplier: number }[];
+  immuneTo: string[];
+};
+
+export type PokemonEvolutionStage = {
+  stage: number;
+  options: { id: number; name: string }[];
 };

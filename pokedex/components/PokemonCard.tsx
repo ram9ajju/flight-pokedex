@@ -32,7 +32,7 @@ export function PokemonCard({ p }: { p: PokemonListItem }) {
 
           <div className={styles.types}>
             {p.types.map((t) => (
-              <TypeBadge key={t} type={t} />
+              <TypeBadge key={t} type={t} size="md" />
             ))}
           </div>
         </div>
