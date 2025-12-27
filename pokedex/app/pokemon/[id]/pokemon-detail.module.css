@@ -568,8 +568,59 @@
   gap: 12px;
 }
 
+/* ============================
+   MOBILE FIX: EVOLUTIONS
+   ============================ */
+
 @media (max-width: 520px) {
-  .evoBranchRow {
+  /* Force single column */
+  .evoGrid3 {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Each evo item becomes a clean vertical stack */
+  .evoGridItem {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Remove arrow on mobile */
+  .evoMiniArrow {
+    display: none;
+  }
+
+  /* Compact card */
+  .evoMiniCard {
+    width: 100%;
+    max-width: 220px;
+    padding: 12px;
+  }
+
+  /* Tighten portrait */
+  .evoMiniPortrait {
+    margin-bottom: 8px;
+  }
+
+  .evoMiniImg {
+    width: 96px;
+    height: 96px;
+  }
+
+  /* Center meta text */
+  .evoMiniMeta,
+  .evoMiniText {
+    text-align: center;
+    gap: 2px;
+  }
+
+  .evoMiniName {
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .evoMiniDex {
+    font-size: 11px;
+    opacity: 0.65;
   }
 }
